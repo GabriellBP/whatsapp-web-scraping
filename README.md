@@ -12,6 +12,6 @@ Just a simple whatsapp web scraping to collect data from conversations.
  Can occurr that the whatsapp change the css classes name the it uses, if it occurrs the program won't be able to get the contact list, scroll the side-pane or get the messages. To solve that you must have to look for the current css class name and change in the code. To help in that, below there are some prints indicating the css classes used
 
 <kbd><img src="readme/image_1.png" /></kbd>
-<kbd><img src="readme/image_1.png" /></kbd>
-<kbd><img src="readme/image_1.png" /></kbd>
-<kbd><img src="readme/image_1.png" /></kbd>
+<kbd><img src="readme/image_2.png" /></kbd>
+<kbd><img src="readme/image_3.png" /></kbd>
+<kbd><img src="readme/image_4.png" /></kbd>
