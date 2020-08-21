@@ -1,7 +1,9 @@
+import os
+import pickle
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from time import sleep
-
 
 # you can set the chromedriver path on the system path and remove this variable
 CHROMEDRIVER_PATH = 'utils/chromedriver.exe'
@@ -26,9 +28,8 @@ def send_a_message(driver):
 def pane_scroll(dr):
     global SCROLL_TO, SCROLL_SIZE
 
-    print('>>> scrolling')
+    print('>>> scrolling side pane')
     side_pane = dr.find_element_by_id('pane-side')
-    print('.')
     dr.execute_script('arguments[0].scrollTop = '+str(SCROLL_TO), side_pane)
     sleep(3)
     SCROLL_TO += SCROLL_SIZE
@@ -37,19 +38,19 @@ def pane_scroll(dr):
 def get_messages(driver, contact_list):
     global SCROLL_SIZE
     print('>>> getting messages')
-
     conversations = []
     for contact in contact_list:
-        print(contact_list)
+
         sleep(2)
         user = driver.find_element_by_xpath('//span[contains(@title, "{}")]'.format(contact))
         user.click()
-        sleep(2)
-        conversation_pane = driver.find_element_by_id('main')
+        sleep(3)
+        conversation_pane = driver.find_element_by_xpath("//div[@class='_2-aNW']")
+        # conversation_pane = driver.find_element_by_id('main')
 
         messages = set()
         length = 0
-        scroll = 0
+        scroll = SCROLL_SIZE
         while True:
             elements = driver.find_elements_by_xpath("//div[@class='copyable-text']")
             for e in elements:
@@ -58,11 +59,14 @@ def get_messages(driver, contact_list):
                 break
             else:
                 length = len(messages)
-            driver.execute_script('arguments[0].scrollBottom = ' + str(scroll), conversation_pane)
-            scroll -= SCROLL_SIZE  # todo: scroll doesn't work
-            print(messages)
-            input('oi')
+            driver.execute_script('arguments[0].scrollTop = -' + str(scroll), conversation_pane)
+            sleep(2)
+            scroll += SCROLL_SIZE
         conversations.append(messages)
+        filename = 'collected_data/conversations/{}.json'.format(contact)
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        with open(filename, 'wb') as fp:
+            pickle.dump(messages, fp)
     return conversations
 
 
@@ -88,14 +92,17 @@ def main():
             contacts_sel = set([j.text for j in contacts_sel])
             conversations.extend(get_messages(driver, list(contacts_sel-contacts)))
             contacts.update(contacts_sel)
-            if length == len(contacts):
+            if length == len(contacts) and length != 0:
                 break
             else:
                 length = len(contacts)
             pane_scroll(driver)
-            break
         print(len(contacts), "contacts retrieved")
         print(len(conversations), "conversations retrieved")
+        filename = 'collected_data/all.json'
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        with open(filename, 'wb') as fp:
+            pickle.dump(conversations, fp)
     except Exception as e:
         print(e)
         driver.quit()
