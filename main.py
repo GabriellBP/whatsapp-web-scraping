@@ -46,7 +46,6 @@ def get_messages(driver, contact_list):
         user.click()
         sleep(3)
         conversation_pane = driver.find_element_by_xpath("//div[@class='_2-aNW']")
-        # conversation_pane = driver.find_element_by_id('main')
 
         messages = set()
         length = 0
